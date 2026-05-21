@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Ads N-gram Analyzer — Free PPC Tool by Shaun Mengella</title>
+<meta name="description" content="Free in-browser tool. Upload your Google Ads search terms report and find the words wasting your spend in seconds. No signup, no data stored.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Google brand palette */
+    --g-blue: #4285F4;
+    --g-blue-dark: #1A73E8;
+    --g-red: #EA4335;
+    --g-red-dark: #C5221F;
+    --g-yellow: #FBBC04;
+    --g-yellow-dark: #F9AB00;
+    --g-green: #34A853;
+    --g-green-dark: #188038;
+
+    --ink: #ffffff;             /* page background (white) */
+    --surface2: #ffffff;        /* card / panel surface */
+    --surface3: #F8F9FA;        /* subtle surface for inputs / table headers */
+    --surface4: #F1F3F4;        /* slightly deeper surface */
+    --border: #E8EAED;          /* primary border */
+    --border2: #DADCE0;         /* stronger border */
+    --text: #202124;            /* primary text */
+    --text2: #5F6368;           /* secondary text */
+    --text3: #80868B;           /* tertiary / labels */
+
+    --accent: var(--g-blue);
+    --accent2: var(--g-blue-dark);
+    --red: var(--g-red);
+    --red-dark: var(--g-red-dark);
+    --amber: var(--g-yellow-dark);
+    --amber-soft: #FEF7E0;
+    --green: var(--g-green);
+    --green-dark: var(--g-green-dark);
+    --blue: var(--g-blue);
+
+    --red-soft: #FCE8E6;
+    --green-soft: #E6F4EA;
+    --blue-soft: #E8F0FE;
+
+    --serif: 'DM Serif Display', serif;
+    --sans: 'Instrument Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+
+    --shadow-sm: 0 1px 2px 0 rgba(60,64,67,0.08), 0 1px 3px 1px rgba(60,64,67,0.04);
+    --shadow-md: 0 1px 3px 0 rgba(60,64,67,0.12), 0 4px 8px 3px rgba(60,64,67,0.06);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--sans); background: var(--ink); color: var(--text); min-height: 100vh; font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  body::before { content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(circle at 0% 0%, rgba(66,133,244,0.06), transparent 40%),
+      radial-gradient(circle at 100% 0%, rgba(234,67,53,0.05), transparent 35%),
+      radial-gradient(circle at 100% 100%, rgba(251,188,4,0.05), transparent 40%),
+      radial-gradient(circle at 0% 100%, rgba(52,168,83,0.05), transparent 35%);
+  }
+  .wrap { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+  /* ============== HERO ============== */
+  .hero { padding: 80px 0 60px; border-bottom: 1px solid var(--border); animation: fadeUp 0.5s ease both; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--g-blue-dark); background: var(--blue-soft); border: 1px solid rgba(66,133,244,0.2); padding: 4px 12px; border-radius: 20px; margin-bottom: 24px; }
+  .eyebrow::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--g-blue); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+  h1 { font-family: var(--serif); font-size: clamp(38px,6vw,64px); line-height: 1.05; letter-spacing: -0.02em; color: var(--text); margin-bottom: 20px; }
+  /* Google four-color accent on the emphasized word */
+  h1 em { font-style: italic;
+    background-image: linear-gradient(90deg, var(--g-blue) 0 25%, var(--g-red) 25% 50%, var(--g-yellow) 50% 75%, var(--g-green) 75% 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+  }
+  .hero-sub { font-size: 17px; color: var(--text2); max-width: 620px; line-height: 1.6; margin-bottom: 32px; }
+  .hero-meta { display: flex; align-items: center; gap: 24px; font-size: 13px; color: var(--text3); flex-wrap: wrap; }
+
+  /* ============== TRUST BAR ============== */
+  .trust-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; padding: 24px 0; border-bottom: 1px solid var(--border); animation: fadeUp 0.5s 0.1s ease both; }
+  @media(max-width:760px){ .trust-bar { grid-template-columns: repeat(2, 1fr); } }
+  .trust-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text2); }
+  .trust-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--surface3); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; border: 1px solid var(--border); }
+  .trust-item:nth-child(1) .trust-icon { background: var(--blue-soft); color: var(--g-blue-dark); border-color: rgba(66,133,244,0.25); }
+  .trust-item:nth-child(2) .trust-icon { background: var(--red-soft); color: var(--g-red-dark); border-color: rgba(234,67,53,0.25); }
+  .trust-item:nth-child(3) .trust-icon { background: var(--amber-soft); color: var(--g-yellow-dark); border-color: rgba(251,188,4,0.35); }
+  .trust-item:nth-child(4) .trust-icon { background: var(--green-soft); color: var(--g-green-dark); border-color: rgba(52,168,83,0.25); }
+  .trust-item div { line-height: 1.4; }
+  .app-shell { padding: 48px 0; animation: fadeUp 0.5s 0.2s ease both; }
+
+  /* ============== STEPS ============== */
+  .step-nav { display: flex; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 32px; box-shadow: var(--shadow-sm); }
+  .step-btn { flex: 1; padding: 14px 16px; background: none; border: none; cursor: pointer; color: var(--text3); font-family: var(--sans); font-size: 13px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; position: relative; }
+  .step-btn:not(:last-child)::after { content: ''; position: absolute; right: 0; top: 20%; height: 60%; width: 1px; background: var(--border); }
+  .step-btn.active { background: var(--surface3); color: var(--text); }
+  .step-num { width: 20px; height: 20px; border-radius: 50%; background: var(--surface3); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--text3); flex-shrink: 0; transition: all 0.2s; }
+  .step-btn.active .step-num { background: var(--g-blue); color: #fff; border-color: var(--g-blue); }
+  .step-btn.done .step-num { background: var(--g-green); color: #fff; border-color: var(--g-green); }
+  .step-btn.done { color: var(--text2); }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ============== PANELS ============== */
+  .panel { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 20px; box-shadow: var(--shadow-sm); }
+  .panel-head { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--surface3); }
+  .platform-badge { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; background: var(--blue-soft); color: var(--g-blue-dark); }
+  .panel-label { font-size: 13px; font-weight: 500; color: var(--text2); }
+  .panel textarea { width: 100%; height: 220px; background: transparent; border: none; outline: none; resize: vertical; font-family: var(--mono); font-size: 11.5px; line-height: 1.6; color: var(--text); padding: 14px 16px; }
+  .panel textarea::placeholder { color: var(--text3); }
+  .panel-foot { padding: 10px 16px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text3); line-height: 1.5; background: var(--surface3); }
+  .panel-foot strong { color: var(--text2); }
+  .import-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; font-size: 12px; font-weight: 500; font-family: var(--sans); cursor: pointer; background: #fff; color: var(--text2); border: 1px solid var(--border2); border-radius: 6px; transition: all 0.15s; margin-left: auto; flex-shrink: 0; }
+  .import-btn:hover { background: var(--surface3); color: var(--text); border-color: var(--g-blue); }
+  .import-btn.loaded { color: var(--g-green-dark); border-color: rgba(52,168,83,0.4); background: var(--green-soft); }
+  .import-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+  .file-input-hidden { display: none; }
+
+  /* ============== OPTIONS ============== */
+  .options-row { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 24px; box-shadow: var(--shadow-sm); }
+  .options-title { font-size: 11px; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+  .options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+  .opt-group { display: flex; flex-direction: column; gap: 4px; }
+  .opt-group label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; }
+  .opt-group input, .opt-group select { background: #fff; border: 1px solid var(--border2); border-radius: 6px; color: var(--text); font-family: var(--sans); font-size: 13px; padding: 7px 10px; height: 34px; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+  .opt-group input:focus, .opt-group select:focus { border-color: var(--g-blue); box-shadow: 0 0 0 3px rgba(66,133,244,0.15); }
+  .opt-checkboxes { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; padding-top: 12px; border-top: 1px solid var(--border); }
+  .opt-label { font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .opt-label input[type=checkbox] { accent-color: var(--g-blue); width: 14px; height: 14px; cursor: pointer; }
+
+  /* ============== CTA ============== */
+  .cta-wrap { text-align: center; }
+  .cta-btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 36px; background: var(--g-blue); color: #fff; font-family: var(--sans); font-size: 15px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; transition: background 0.15s, transform 0.1s, box-shadow 0.15s; letter-spacing: -0.01em; box-shadow: 0 1px 2px rgba(60,64,67,0.1), 0 2px 6px rgba(66,133,244,0.25); }
+  .cta-btn:hover { background: var(--g-blue-dark); transform: translateY(-1px); box-shadow: 0 2px 4px rgba(60,64,67,0.12), 0 4px 12px rgba(66,133,244,0.3); }
+  .cta-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* ============== STAT CARDS ============== */
+  .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 24px; }
+  @media(max-width:760px){ .stats-row { grid-template-columns: repeat(2,1fr); } }
+  .stat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; }
+  .stat-card::before { content:''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--g-blue); }
+  .stat-card.highlight::before { background: var(--g-red); }
+  .stat-card.good::before { background: var(--g-green); }
+  .stat-card.warn::before { background: var(--g-yellow-dark); }
+  .stat-card.highlight { background: linear-gradient(180deg, var(--red-soft) 0%, #fff 70%); border-color: rgba(234,67,53,0.25); }
+  .stat-card.good { background: linear-gradient(180deg, var(--green-soft) 0%, #fff 70%); border-color: rgba(52,168,83,0.25); }
+  .slabel { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .sval { font-family: var(--serif); font-size: 28px; color: var(--text); line-height: 1; }
+  .stat-card.highlight .sval { color: var(--g-red-dark); }
+  .stat-card.good .sval { color: var(--g-green-dark); }
+  .ssub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+  /* ============== ALERTS ============== */
+  .alert { padding: 14px 18px; border-radius: 10px; font-size: 13px; line-height: 1.5; margin-bottom: 20px; display: flex; gap: 12px; align-items: flex-start; border: 1px solid; }
+  .alert-danger { background: var(--red-soft); border-color: rgba(234,67,53,0.25); color: var(--g-red-dark); }
+  .alert-ok { background: var(--green-soft); border-color: rgba(52,168,83,0.25); color: var(--g-green-dark); }
+  .alert-warn { background: var(--amber-soft); border-color: rgba(251,188,4,0.35); color: #B06000; }
+  .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .alert strong { color: inherit; font-weight: 700; }
+
+  /* ============== GRAM TABS ============== */
+  .gram-tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 0; overflow-x: auto; }
+  .gram-tab { background: none; border: none; padding: 10px 16px; font-family: var(--sans); font-size: 13px; font-weight: 500; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; transition: all 0.15s; }
+  .gram-tab:hover { color: var(--text2); }
+  .gram-tab.active { color: var(--g-blue-dark); border-bottom-color: var(--g-blue); }
+  .gram-tab .count { font-size: 11px; color: var(--text3); margin-left: 4px; }
+  .gram-tab.active .count { color: var(--g-blue-dark); }
+
+  /* ============== TABLE ============== */
+  .table-wrap { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 24px; box-shadow: var(--shadow-sm); }
+  .table-toolbar { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: var(--surface3); }
+  .table-toolbar select, .table-toolbar input[type=text], .table-toolbar input[type=number] { background: #fff; border: 1px solid var(--border2); border-radius: 6px; color: var(--text); font-family: var(--sans); font-size: 12px; padding: 6px 10px; height: 32px; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+  .table-toolbar select:focus, .table-toolbar input:focus { border-color: var(--g-blue); box-shadow: 0 0 0 2px rgba(66,133,244,0.15); }
+  .table-toolbar input[type=text] { width: 200px; }
+  .table-toolbar input[type=number] { width: 90px; }
+  .table-toolbar label { font-size: 11px; color: var(--text3); display: flex; align-items: center; gap: 6px; }
+  .export-btn { margin-left: auto; background: #fff; border: 1px solid var(--border2); border-radius: 6px; color: var(--text2); font-family: var(--sans); font-size: 12px; padding: 6px 14px; height: 32px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 6px; }
+  .export-btn:hover { color: var(--g-blue-dark); border-color: var(--g-blue); background: var(--blue-soft); }
+  .table-scroll { overflow-x: auto; max-height: 700px; overflow-y: auto; }
+  .results-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .results-table th { text-align: left; padding: 10px 14px; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); border-bottom: 1px solid var(--border); background: var(--surface3); position: sticky; top: 0; cursor: pointer; user-select: none; white-space: nowrap; z-index: 1; }
+  .results-table th:hover { color: var(--text); background: var(--surface4); }
+  .results-table th.sort-asc::after { content: ' \2191'; color: var(--g-blue); }
+  .results-table th.sort-desc::after { content: ' \2193'; color: var(--g-blue); }
+  .results-table td { padding: 10px 14px; color: var(--text2); border-bottom: 1px solid var(--border); vertical-align: top; white-space: nowrap; }
+  .results-table tr:last-child td { border-bottom: none; }
+  .results-table tr:hover td { background: var(--surface3); }
+  .results-table tr.flagged td { background: rgba(234,67,53,0.04); }
+  .results-table tr.flagged:hover td { background: rgba(234,67,53,0.09); }
+  .results-table tr.profitable td { background: rgba(52,168,83,0.04); }
+  .results-table tr.profitable:hover td { background: rgba(52,168,83,0.09); }
+  .mono { font-family: var(--mono); font-size: 11.5px; color: var(--text); }
+  .num { font-family: var(--mono); font-size: 12px; text-align: right; color: var(--text); }
+  .gram-cell { font-family: var(--mono); font-size: 12px; color: var(--text); font-weight: 500; }
+
+  /* ============== PILLS ============== */
+  .pill { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; letter-spacing: 0.03em; }
+  .pill-danger { background: var(--red-soft); color: var(--g-red-dark); }
+  .pill-warning { background: var(--amber-soft); color: #B06000; }
+  .pill-ok { background: var(--green-soft); color: var(--g-green-dark); }
+  .pill-blue { background: var(--blue-soft); color: var(--g-blue-dark); }
+  .pill-neutral { background: var(--surface4); color: var(--text2); }
+
+  /* ============== NEGATIVES BLOCK ============== */
+  .neg-output { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 24px; box-shadow: var(--shadow-sm); }
+  .neg-head { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: linear-gradient(90deg, var(--blue-soft) 0%, #fff 100%); }
+  .neg-head h3 { font-family: var(--serif); font-size: 20px; color: var(--text); }
+  .neg-head .neg-meta { font-size: 11px; color: var(--text3); }
+  .neg-body { padding: 16px 18px; }
+  .neg-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .copy-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; font-size: 12px; font-weight: 500; font-family: var(--sans); cursor: pointer; background: #fff; color: var(--text2); border: 1px solid var(--border2); border-radius: 6px; transition: all 0.15s; }
+  .copy-btn:hover { color: var(--g-blue-dark); background: var(--blue-soft); border-color: var(--g-blue); }
+  .neg-list { background: var(--surface3); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; font-family: var(--mono); font-size: 11.5px; line-height: 1.7; color: var(--text); max-height: 280px; overflow-y: auto; white-space: pre-wrap; }
+  .neg-summary { font-size: 12px; color: var(--text2); margin-bottom: 12px; line-height: 1.5; }
+  .neg-summary strong { color: var(--text); }
+
+  /* ============== EMPTY STATE ============== */
+  .empty-state { text-align: center; padding: 48px 16px; color: var(--text3); }
+  .empty-big { font-family: var(--serif); font-size: 32px; color: var(--text3); margin-bottom: 8px; }
+
+  /* ============== HELP DETAILS ============== */
+  details.help { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 0; margin-bottom: 20px; box-shadow: var(--shadow-sm); }
+  details.help summary { padding: 14px 18px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text2); list-style: none; display: flex; align-items: center; gap: 8px; }
+  details.help summary::-webkit-details-marker { display: none; }
+  details.help summary::before { content: '+'; font-size: 16px; color: var(--g-blue); transition: transform 0.2s; font-weight: 600; }
+  details.help[open] summary::before { content: '\2212'; }
+  details.help summary:hover { color: var(--text); }
+  details.help .help-body { padding: 0 18px 18px; font-size: 13px; color: var(--text2); line-height: 1.7; }
+  details.help .help-body ol { margin-left: 18px; }
+  details.help .help-body li { margin-bottom: 4px; }
+  details.help .help-body strong { color: var(--text); }
+  details.help .help-body code { background: var(--blue-soft); padding: 2px 6px; border-radius: 4px; font-family: var(--mono); font-size: 11.5px; color: var(--g-blue-dark); font-weight: 500; }
+
+  /* ============== INSIGHTS GRID ============== */
+  .insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  @media(max-width:760px){ .insights-grid { grid-template-columns: 1fr; } }
+  .insight-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; }
+  .insight-card::before { content:''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .insight-card.waste::before { background: var(--g-red); }
+  .insight-card.win::before { background: var(--g-green); }
+  .insight-card h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 10px; font-weight: 600; }
+  .insight-card.waste h4 { color: var(--g-red-dark); }
+  .insight-card.win h4 { color: var(--g-green-dark); }
+  .insight-card .insight-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 12.5px; gap: 12px; }
+  .insight-card .insight-row:last-child { border-bottom: none; }
+  .insight-card .insight-key { color: var(--text); font-family: var(--mono); font-size: 12px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .insight-card .insight-val { color: var(--text3); font-family: var(--mono); font-size: 11px; flex-shrink: 0; }
+
+  /* ============== FOOTER ============== */
+  .footer-cta { margin-top: 48px; background: var(--surface2); border: 1px solid var(--border); border-radius: 16px; padding: 36px 40px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; box-shadow: var(--shadow-md); position: relative; overflow: hidden; }
+  .footer-cta::before { content:''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--g-blue) 0 25%, var(--g-red) 25% 50%, var(--g-yellow) 50% 75%, var(--g-green) 75% 100%);
+  }
+  .footer-cta h3 { font-family: var(--serif); font-size: 26px; margin-bottom: 6px; color: var(--text); }
+  .footer-cta p { font-size: 14px; color: var(--text2); max-width: 440px; }
+  .linkedin-btn { display: inline-flex; align-items: center; gap: 10px; padding: 12px 24px; background: #0A66C2; color: #fff; font-family: var(--sans); font-size: 14px; font-weight: 600; border-radius: 8px; text-decoration: none; transition: background 0.15s, box-shadow 0.15s; white-space: nowrap; flex-shrink: 0; box-shadow: 0 1px 2px rgba(60,64,67,0.1), 0 2px 6px rgba(10,102,194,0.25); }
+  .linkedin-btn:hover { background: #084d92; box-shadow: 0 2px 4px rgba(60,64,67,0.12), 0 4px 12px rgba(10,102,194,0.3); }
+  .linkedin-btn svg { width: 18px; height: 18px; fill: currentColor; }
+  .watermark { text-align: center; padding: 32px 0 48px; font-size: 12px; color: var(--text3); }
+  .watermark strong { color: var(--text2); font-weight: 500; }
+  .watermark a { color: var(--text2); text-decoration: none; }
+  .watermark a:hover { color: var(--g-blue-dark); text-decoration: underline; }
+
+  /* ============== SCOPE BAR ============== */
+  .scope-bar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 14px 18px; margin-bottom: 20px;
+    background: linear-gradient(90deg, var(--blue-soft), #fff);
+    border: 1px solid rgba(66,133,244,0.25); border-radius: 12px; box-shadow: var(--shadow-sm); }
+  .scope-label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--g-blue-dark); flex-shrink: 0; }
+  .scope-icon { font-size: 16px; }
+  .scope-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; flex: 1; }
+  .scope-btn { background: #fff; border: 1px solid var(--border2); border-radius: 6px; color: var(--text2); font-family: var(--sans); font-size: 12px; font-weight: 500; padding: 6px 14px; height: 32px; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+  .scope-btn:hover { color: var(--g-blue-dark); border-color: var(--g-blue); background: var(--blue-soft); }
+  .scope-btn.active { background: var(--g-blue); color: #fff; border-color: var(--g-blue); }
+  .scope-btn.active .scope-count { color: rgba(255,255,255,0.85); }
+  .scope-count { color: var(--text3); font-weight: 400; font-size: 11px; margin-left: 4px; }
+  .scope-select { background: #fff; border: 1px solid var(--border2); border-radius: 6px; color: var(--text); font-family: var(--sans); font-size: 12px; padding: 6px 10px; height: 32px; outline: none; min-width: 180px; max-width: 260px; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+  .scope-select:focus { border-color: var(--g-blue); box-shadow: 0 0 0 2px rgba(66,133,244,0.15); }
+  .scope-clear { background: transparent; border: 1px solid transparent; border-radius: 6px; color: var(--g-red-dark); font-family: var(--sans); font-size: 12px; font-weight: 500; padding: 6px 12px; height: 32px; cursor: pointer; transition: all 0.15s; }
+  .scope-clear:hover { background: var(--red-soft); border-color: rgba(234,67,53,0.25); }
+
+  /* ============== EXPAND BUTTON + DRAWER ============== */
+  .expand-cell { width: 32px; padding: 8px !important; text-align: center; }
+  .expand-btn { width: 22px; height: 22px; border-radius: 4px; background: var(--surface3); border: 1px solid var(--border2); color: var(--text2); font-family: var(--mono); font-size: 14px; font-weight: 600; line-height: 1; cursor: pointer; transition: all 0.12s; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+  .expand-btn:hover { background: var(--g-blue); color: #fff; border-color: var(--g-blue); }
+  .expand-btn.open { background: var(--g-blue); color: #fff; border-color: var(--g-blue); }
+  .results-table tr.expandable { cursor: pointer; }
+  .results-table tr.expandable:hover .expand-btn { background: var(--g-blue); color: #fff; border-color: var(--g-blue); }
+
+  .results-table tr.ctx-drawer { background: var(--surface3) !important; }
+  .results-table tr.ctx-drawer:hover td { background: var(--surface3) !important; }
+  .results-table tr.ctx-drawer > td { padding: 0 !important; border-bottom: 2px solid var(--g-blue) !important; }
+  .ctx-drawer-inner { padding: 16px 18px; }
+  .ctx-drawer-title { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; font-size: 13px; color: var(--text); }
+  .ctx-drawer-title strong { color: var(--g-blue-dark); font-weight: 600; }
+  .ctx-drawer-actions { display: flex; gap: 6px; }
+  .ctx-table { width: 100%; border-collapse: collapse; font-size: 12px; background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .ctx-table th { text-align: left; padding: 8px 12px; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text3); border-bottom: 1px solid var(--border); background: var(--surface3); position: static; }
+  .ctx-table th.num { text-align: right; }
+  .ctx-table td { padding: 10px 12px; color: var(--text2); border-bottom: 1px solid var(--border); vertical-align: top; white-space: normal; }
+  .ctx-table tr:last-child td { border-bottom: none; }
+  .ctx-table tr.ctx-row-waste td { background: rgba(234,67,53,0.04); }
+  .ctx-table tr.ctx-row-waste td.ctx-name { color: var(--g-red-dark); font-weight: 500; }
+  .ctx-table td.ctx-name { font-weight: 500; color: var(--text); max-width: 220px; word-break: break-word; }
+  .ctx-table td.num { font-family: var(--mono); font-size: 11.5px; text-align: right; white-space: nowrap; color: var(--text); }
+  .ctx-table td.ctx-samples { max-width: 360px; }
+  .ctx-sample { font-family: var(--mono); font-size: 11px; color: var(--text); padding: 2px 0; word-break: break-word; }
+  .ctx-sample-meta { color: var(--text3); font-size: 10px; }
+  .ctx-sample-more { font-size: 10.5px; color: var(--text3); font-style: italic; padding-top: 2px; }
+
+  .col-camp.single { color: var(--g-yellow-dark); font-weight: 600; }
+
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--text); color: #fff; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; box-shadow: var(--shadow-md); opacity: 0; transform: translateY(8px); transition: opacity 0.2s, transform 0.2s; pointer-events: none; z-index: 2000; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Free Google Ads tool</div>
+    <h1>Find the words<br>wasting your <em>ad spend.</em></h1>
+    <p class="hero-sub">Upload your Google Ads search terms report. In 5 seconds you'll see which 1, 2 and 3-word patterns are eating budget without converting &mdash; and get a copy-paste negative keyword list ready for Google Ads Editor.</p>
+    <div class="hero-meta">
+      <span>&#9889; No signup. No data stored. 100% in-browser.</span>
+      <span>&#128274; Your data never leaves your device.</span>
+    </div>
+  </div>
+  <div class="trust-bar">
+    <div class="trust-item"><div class="trust-icon">&#128269;</div><div>1, 2 &amp; 3-gram analysis<br><span style="color:var(--text3);font-size:12px;">across every search term</span></div></div>
+    <div class="trust-item"><div class="trust-icon">&#128184;</div><div>Wasted spend per n-gram<br><span style="color:var(--text3);font-size:12px;">ranked by cost &amp; CVR</span></div></div>
+    <div class="trust-item"><div class="trust-icon">&#128203;</div><div>Negative keyword list<br><span style="color:var(--text3);font-size:12px;">ready for Google Ads Editor</span></div></div>
+    <div class="trust-item"><div class="trust-icon">&#128202;</div><div>Export full audit as CSV<br><span style="color:var(--text3);font-size:12px;">share with team or client</span></div></div>
+  </div>
+</div>
+
+<div class="wrap app-shell">
+
+  <details class="help">
+    <summary>How to export your search terms report from Google Ads (30 seconds)</summary>
+    <div class="help-body">
+      <ol>
+        <li>Go to <strong>Google Ads &rarr; Insights and reports &rarr; Search terms</strong> (or open any campaign and click <strong>Insights &rarr; Search terms</strong>).</li>
+        <li>Set your date range &mdash; last 30, 60 or 90 days is usually best. More data = better patterns.</li>
+        <li>Make sure these columns are visible: <code>Search term</code>, <code>Campaign</code>, <code>Ad group</code>, <code>Clicks</code>, <code>Impr.</code>, <code>Cost</code>, <code>Conversions</code>, <code>Conv. value</code>. Add via the columns icon if missing. <strong>Including Campaign + Ad group is what unlocks per-campaign analysis.</strong></li>
+        <li>Click the <strong>download icon</strong> (top right) &rarr; <strong>CSV</strong>. Don't pick "Google Sheets" &mdash; CSV is what we need.</li>
+        <li>Drop the file in below, or paste the contents. The tool handles the 2-row preamble Google sometimes adds.</li>
+      </ol>
+      <p style="margin-top: 10px;"><strong>Tip:</strong> Also works for Microsoft Ads exports (similar column names) and Search Terms Insights from Performance Max.</p>
+    </div>
+  </details>
+
+  <div class="step-nav">
+    <button class="step-btn active" id="tab-input" onclick="goTab('input')">
+      <span class="step-num" id="num-1">1</span> Upload search terms
+    </button>
+    <button class="step-btn" id="tab-results" onclick="goTab('results')">
+      <span class="step-num" id="num-2">2</span> N-gram analysis
+    </button>
+  </div>
+
+  <div class="section active" id="section-input">
+    <div class="panel">
+      <div class="panel-head">
+        <span class="platform-badge">Google Ads</span>
+        <span class="panel-label">Search terms report</span>
+        <input type="file" id="st-file" accept=".csv,.tsv,.txt" class="file-input-hidden" onchange="loadFile()">
+        <button class="import-btn" id="st-import-btn" onclick="document.getElementById('st-file').click()">
+          <svg viewBox="0 0 13 13" fill="none"><path d="M6.5 1v7M4 5.5l2.5 2.5L9 5.5M1.5 10h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Import CSV
+        </button>
+      </div>
+      <textarea id="st-input" placeholder="Or paste your Google Ads Search Terms CSV here.
+
+Expected columns (auto-detected, in any order):
+Search term, Campaign, Ad group, Clicks, Impr., Cost, Conversions, Conv. value
+
+Campaign + Ad group are optional but unlock per-campaign breakdowns and scope-correct negatives.
+
+Example:
+Search term,Campaign,Ad group,Clicks,Impr.,Cost,Conversions,Conv. value
+vegan dog food uk,Brand - Search,Core,142,1820,124.30,8,420.00
+free vegan dog food samples,Generic - BMM,Vegan - BMM,89,1240,76.50,0,0.00
+best vegan dog food for puppies,Generic - BMM,Puppies,67,890,58.20,4,210.00
+buy vegan dog food cheap,Generic - BMM,Vegan - BMM,45,520,38.10,2,98.50
+how to make dog food at home,Generic - BMM,Vegan - BMM,203,2840,178.40,0,0.00"></textarea>
+      <div class="panel-foot" id="st-foot">
+        Expected file: <strong>Google Ads search terms export</strong> in CSV. Column names are auto-detected. The 2-row "Report name" header Google adds is handled automatically.
+      </div>
+    </div>
+
+    <div class="options-row">
+      <div class="options-title">Analysis settings</div>
+      <div class="options-grid">
+        <div class="opt-group">
+          <label for="opt-currency">Currency symbol</label>
+          <select id="opt-currency">
+            <option value="&#163;">&#163; &mdash; GBP</option>
+            <option value="$">$ &mdash; USD/AUD/CAD</option>
+            <option value="&#8364;">&#8364; &mdash; EUR</option>
+            <option value="&#165;">&#165; &mdash; JPY/CNY</option>
+            <option value="&#8377;">&#8377; &mdash; INR</option>
+            <option value="">No symbol</option>
+          </select>
+        </div>
+        <div class="opt-group">
+          <label for="opt-min-clicks">Min clicks per n-gram</label>
+          <input type="number" id="opt-min-clicks" value="5" min="1" max="1000">
+        </div>
+        <div class="opt-group">
+          <label for="opt-min-cost">Min cost to flag (waste threshold)</label>
+          <input type="number" id="opt-min-cost" value="10" min="0" step="0.01">
+        </div>
+        <div class="opt-group">
+          <label for="opt-cvr-threshold">CVR floor &mdash; below = wasteful (%)</label>
+          <input type="number" id="opt-cvr-threshold" value="1" min="0" max="100" step="0.1">
+        </div>
+      </div>
+      <div class="opt-checkboxes">
+        <label class="opt-label"><input type="checkbox" id="opt-lower" checked> Lowercase everything</label>
+        <label class="opt-label"><input type="checkbox" id="opt-strip-punct" checked> Strip punctuation</label>
+        <label class="opt-label"><input type="checkbox" id="opt-stop"> Skip common stopwords (a, the, of&hellip;)</label>
+        <label class="opt-label"><input type="checkbox" id="opt-trim-num"> Skip pure numbers</label>
+      </div>
+    </div>
+
+    <div class="cta-wrap">
+      <button class="cta-btn" id="run-btn" onclick="runAnalysis()">
+        <svg viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M2 8l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Run n-gram analysis
+      </button>
+    </div>
+  </div>
+
+  <div class="section" id="section-results">
+    <div id="results-content">
+      <div class="empty-state">
+        <div class="empty-big">&mdash;</div>
+        Run the analysis from step 1 to see your results here.
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-cta">
+    <div>
+      <h3>Found this useful?</h3>
+      <p>Follow me on LinkedIn for more free tools like this one.</p>
+    </div>
+    <a class="linkedin-btn" href="https://www.linkedin.com/in/shaun-mengella-539a7153/" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      Connect with Shaun
+    </a>
+  </div>
+  <div class="watermark">
+    Built by <strong><a href="https://www.linkedin.com/in/shaun-mengella-539a7153/" target="_blank" rel="noopener">Shaun Mengella</a></strong>
+    &nbsp;&middot;&nbsp; <strong>Google Ads N-gram Analyzer v1.0</strong>
+    &nbsp;&middot;&nbsp; No data stored or transmitted. Everything runs in your browser.
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// ============== STATE ==============
+let _results = null;
+let _activeGram = 2;
+let _sortKey = 'cost';
+let _sortDir = 'desc';
+let _filterMode = 'all';
+let _scopeType = 'all';       // 'all' | 'campaign' | 'adgroup'
+let _scopeValue = '';         // the selected campaign or ad group name
+let _expandedRows = new Set(); // n-gram keys currently expanded to show context
+
+// ============== HELPERS ==============
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toast(msg, ms) {
+  ms = ms || 2400;
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, ms);
+}
+
+function goTab(tab) {
+  ['input','results'].forEach(function(t) {
+    document.getElementById('section-' + t).classList.toggle('active', t === tab);
+    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+  });
+}
+
+function money(n, sym) {
+  if (!isFinite(n)) n = 0;
+  const formatted = Math.abs(n).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return (n < 0 ? '-' : '') + (sym || '') + formatted;
+}
+function pct(n) {
+  if (!isFinite(n) || n === null) return '\u2014';
+  return n.toFixed(2) + '%';
+}
+function intf(n) {
+  if (!isFinite(n)) return '0';
+  return Math.round(n).toLocaleString('en-GB');
+}
+
+function parseNum(v) {
+  if (v === null || v === undefined) return 0;
+  let s = String(v).trim();
+  if (!s || s === '--' || s === '-') return 0;
+  s = s.replace(/[\u00a3\u20ac\u00a5\u20b9$"'%]/g, '').replace(/,/g, '').trim();
+  if (/^\(.+\)$/.test(s)) s = '-' + s.slice(1, -1);
+  const n = parseFloat(s);
+  return isFinite(n) ? n : 0;
+}
+
+// ============== FILE LOADING ==============
+function loadFile() {
+  const fi = document.getElementById('st-file');
+  const ta = document.getElementById('st-input');
+  const btn = document.getElementById('st-import-btn');
+  const foot = document.getElementById('st-foot');
+  const file = fi.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    let text = e.target.result;
+    if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+    ta.value = text;
+    const rows = text.trim().split('\n').filter(function(l){ return l.trim(); }).length;
+    btn.classList.add('loaded');
+    btn.innerHTML = '<svg viewBox="0 0 13 13" fill="none" width="13" height="13"><path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg> ' + esc(file.name);
+    foot.innerHTML = '<span style="color:var(--g-green-dark);font-weight:500">\u2713 Loaded <strong>' + rows + ' rows</strong> from ' + esc(file.name) + '. Click "Run n-gram analysis" below.</span>';
+  };
+  reader.onerror = function(){ alert('Could not read that file. Try saving it as CSV and re-uploading.'); };
+  reader.readAsText(file, 'UTF-8');
+  fi.value = '';
+}
+
+// ============== CSV PARSING ==============
+function splitLine(line, sep) {
+  const res = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQ && line[i+1] === '"') { cur += '"'; i++; continue; }
+      inQ = !inQ;
+      continue;
+    }
+    if (ch === sep && !inQ) { res.push(cur); cur = ''; continue; }
+    cur += ch;
+  }
+  res.push(cur);
+  return res;
+}
+
+function detectSeparator(line) {
+  const tabs = (line.match(/\t/g) || []).length;
+  const commas = (line.match(/,/g) || []).length;
+  const semis = (line.match(/;/g) || []).length;
+  if (tabs > commas && tabs > semis) return '\t';
+  if (semis > commas) return ';';
+  return ',';
+}
+
+function parseCSV(text) {
+  let lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(function(l){ return l.trim(); });
+  if (!lines.length) return { headers: [], rows: [] };
+
+  // Find the header row. Google Ads exports often have preamble like:
+  //   "Search terms report"
+  //   "Last 30 days ..."
+  //   ""
+  //   "Search term,Clicks,..."
+  // Skip lines until we find one that looks like a real header.
+  let headerIdx = 0;
+  for (let i = 0; i < Math.min(lines.length, 8); i++) {
+    const sep = detectSeparator(lines[i]);
+    const cells = splitLine(lines[i], sep).map(function(c){ return c.toLowerCase().replace(/^"|"$/g,''); });
+    const looksLikeHeader = cells.length >= 3
+      && cells.some(function(c){ return /search\s*term|keyword|query/.test(c); })
+      && cells.some(function(c){ return /click|impr|cost|spend|conv/.test(c); });
+    if (looksLikeHeader) { headerIdx = i; break; }
+  }
+  lines = lines.slice(headerIdx);
+
+  const sep = detectSeparator(lines[0]);
+  const rawHeaders = splitLine(lines[0], sep).map(function(h){ return h.trim().replace(/^"|"$/g,''); });
+  const headers = rawHeaders.map(function(h){
+    return h.toLowerCase()
+      .replace(/\./g,'')
+      .replace(/[\s\/\-]+/g,'_')
+      .replace(/_+/g,'_')
+      .replace(/^_+|_+$/g,'');
+  });
+
+  const rows = lines.slice(1).map(function(line) {
+    const vals = splitLine(line, sep);
+    const obj = {};
+    headers.forEach(function(h, i){ obj[h] = (vals[i] || '').trim().replace(/^"|"$/g,''); });
+    obj._raw = line;
+    return obj;
+  }).filter(function(r) {
+    // Strip summary rows that Google Ads appends ("Total: search terms", etc.)
+    const firstVal = (Object.values(r)[0] || '').toLowerCase();
+    if (firstVal.indexOf('total') === 0) return false;
+    if (firstVal.indexOf('removed') > -1) return false;
+    if (firstVal.indexOf('---') > -1) return false;
+    if (!Object.values(r).some(function(v){ return v && v !== '_raw'; })) return false;
+    return true;
+  });
+
+  return { headers: headers, rows: rows };
+}
+
+function getCol(row, candidates) {
+  for (let i = 0; i < candidates.length; i++) {
+    const c = candidates[i];
+    if (row[c] !== undefined && row[c] !== '') return row[c];
+  }
+  return '';
+}
+
+// ============== STOPWORDS ==============
+const STOPWORDS = new Set([
+  'a','an','the','and','or','but','of','in','on','at','to','for','with','by','from','as','is','are','was','were','be','been','being',
+  'it','its','this','that','these','those','i','you','he','she','we','they','my','your','his','her','our','their',
+  'do','does','did','have','has','had','will','would','can','could','should','may','might','must','shall',
+  'me','him','us','them','what','which','who','whom','where','when','why','how','if','then','than','so','too','very','just','only'
+]);
+
+// ============== N-GRAM EXTRACTION ==============
+function tokenize(text, opts) {
+  let s = String(text || '');
+  if (opts.lower) s = s.toLowerCase();
+  if (opts.stripPunct) {
+    // Keep letters, numbers, spaces, hyphens, apostrophes; drop everything else.
+    s = s.replace(/[^\p{L}\p{N}\s'\-]/gu, ' ');
+  }
+  let tokens = s.split(/\s+/).filter(function(t){ return t.length > 0; });
+  if (opts.stopwords) tokens = tokens.filter(function(t){ return !STOPWORDS.has(t); });
+  if (opts.skipNumbers) tokens = tokens.filter(function(t){ return !/^\d+(\.\d+)?$/.test(t); });
+  return tokens;
+}
+
+function buildNgrams(tokens, n) {
+  if (tokens.length < n) return [];
+  const out = [];
+  for (let i = 0; i <= tokens.length - n; i++) {
+    out.push(tokens.slice(i, i + n).join(' '));
+  }
+  return out;
+}
+
+// ============== ANALYSIS ==============
+function runAnalysis() {
+  const text = document.getElementById('st-input').value.trim();
+  if (!text) {
+    alert('Please upload or paste a search terms CSV first.');
+    return;
+  }
+
+  const btn = document.getElementById('run-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M2 8l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Analyzing\u2026';
+
+  setTimeout(function() {
+    try {
+      doAnalysis(text);
+    } catch (err) {
+      console.error(err);
+      alert('Something went wrong analyzing the file. Most common cause: unexpected column names. Make sure your CSV has columns for Search term, Clicks, Cost and Conversions.\n\nError: ' + (err.message || err));
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<svg viewBox="0 0 16 16" fill="none" width="16" height="16"><path d="M2 8l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Re-run analysis';
+    }
+  }, 30);
+}
+
+function doAnalysis(text) {
+  const opts = {
+    lower: document.getElementById('opt-lower').checked,
+    stripPunct: document.getElementById('opt-strip-punct').checked,
+    stopwords: document.getElementById('opt-stop').checked,
+    skipNumbers: document.getElementById('opt-trim-num').checked,
+    minClicks: parseInt(document.getElementById('opt-min-clicks').value, 10) || 1,
+    minCost: parseFloat(document.getElementById('opt-min-cost').value) || 0,
+    cvrThreshold: parseFloat(document.getElementById('opt-cvr-threshold').value) || 0,
+    currency: document.getElementById('opt-currency').value
+  };
+
+  const parsed = parseCSV(text);
+  if (!parsed.rows.length) {
+    throw new Error('No data rows found. Check that your CSV has headers in the first row (or near the top) and data below.');
+  }
+
+  // Column name candidates — Google Ads has used various conventions over the years.
+  const COL_TERM     = ['search_term','search_terms','query','search_query'];
+  const COL_CLICKS   = ['clicks'];
+  const COL_IMPR     = ['impr','impressions'];
+  const COL_COST     = ['cost','spend','cost_currency'];
+  const COL_CONV     = ['conversions','conv','all_conv','all_conversions'];
+  const COL_CONVVAL  = ['conv_value','conversion_value','all_conv_value','conv_value_currency','conversions_value'];
+  // Optional context columns — when present they unlock per-campaign/ad-group analysis.
+  const COL_CAMPAIGN = ['campaign','campaign_name'];
+  const COL_ADGROUP  = ['ad_group','adgroup','ad_group_name'];
+  // The literal "keyword" column means the matched keyword (not the search term) — only valid when distinct from search_term.
+  const COL_KEYWORD  = ['keyword','matched_keyword','keyword_text'];
+  const COL_MATCH    = ['match_type','keyword_match_type'];
+
+  // Sanity check the headers contain what we need.
+  const sample = parsed.rows[0];
+  // Search term may live under "search_term" (modern) or "keyword" (very old reports where keyword == search term).
+  // If both exist, prefer search_term. If only "keyword" exists AND there's no separate match type column, treat keyword as the search term.
+  let termCol = null;
+  for (let i = 0; i < COL_TERM.length; i++) {
+    if (sample[COL_TERM[i]] !== undefined) { termCol = COL_TERM[i]; break; }
+  }
+  if (!termCol && sample['keyword'] !== undefined && sample['match_type'] === undefined) {
+    termCol = 'keyword';
+  }
+  const hasClicks = COL_CLICKS.some(function(k){ return sample[k] !== undefined; });
+  if (!termCol || !hasClicks) {
+    throw new Error('Could not find required columns. Need at least "Search term" and "Clicks". Got headers: ' + Object.keys(sample).filter(function(k){ return k !== '_raw'; }).join(', '));
+  }
+
+  // Detect which optional context columns are present (drives UI affordances).
+  const hasCampaign = COL_CAMPAIGN.some(function(k){ return sample[k] !== undefined; });
+  const hasAdGroup  = COL_ADGROUP.some(function(k){ return sample[k] !== undefined; });
+  const hasKeyword  = (termCol !== 'keyword') && COL_KEYWORD.some(function(k){ return sample[k] !== undefined; });
+  const hasMatch    = COL_MATCH.some(function(k){ return sample[k] !== undefined; });
+
+  // n-gram aggregation. For each row we extract n-grams once and attribute
+  // the full row stats to each unique n-gram (de-duped per row).
+  // We ALSO record per-row context (campaign / ad group / matched keyword) so we can
+  // later show "where does this n-gram appear" and generate scope-correct negatives.
+  const grams = { 1: new Map(), 2: new Map(), 3: new Map() };
+  const totals = { clicks: 0, impressions: 0, cost: 0, conversions: 0, convValue: 0, terms: 0 };
+  // Index of all unique campaigns/ad-groups seen, for filter dropdowns.
+  const campaignSet = new Set();
+  const adGroupSet = new Set();
+
+  for (let ri = 0; ri < parsed.rows.length; ri++) {
+    const row = parsed.rows[ri];
+    const term = row[termCol] || '';
+    if (!term) continue;
+    const clicks = parseNum(getCol(row, COL_CLICKS));
+    const impr = parseNum(getCol(row, COL_IMPR));
+    const cost = parseNum(getCol(row, COL_COST));
+    const conv = parseNum(getCol(row, COL_CONV));
+    const convVal = parseNum(getCol(row, COL_CONVVAL));
+
+    const campaign = hasCampaign ? getCol(row, COL_CAMPAIGN) : '';
+    const adGroup  = hasAdGroup  ? getCol(row, COL_ADGROUP)  : '';
+    const keyword  = hasKeyword  ? getCol(row, COL_KEYWORD)  : '';
+    const matchType = hasMatch   ? getCol(row, COL_MATCH)    : '';
+
+    if (campaign) campaignSet.add(campaign);
+    if (adGroup) adGroupSet.add(adGroup);
+
+    totals.clicks += clicks;
+    totals.impressions += impr;
+    totals.cost += cost;
+    totals.conversions += conv;
+    totals.convValue += convVal;
+    totals.terms += 1;
+
+    const tokens = tokenize(term, opts);
+    if (!tokens.length) continue;
+
+    for (let n = 1; n <= 3; n++) {
+      const seen = new Set();
+      const ngrams = buildNgrams(tokens, n);
+      for (let gi = 0; gi < ngrams.length; gi++) {
+        const g = ngrams[gi];
+        if (seen.has(g)) continue;
+        seen.add(g);
+        const map = grams[n];
+        if (!map.has(g)) {
+          map.set(g, {
+            gram: g, clicks: 0, impressions: 0, cost: 0, conversions: 0, convValue: 0, termCount: 0,
+            // contexts: Map<campaign|adgroup key, { campaign, adGroup, clicks, cost, conversions, convValue, termCount, sampleTerms: Map<term, {clicks, cost, conv, convVal}> }>
+            contexts: new Map(),
+            campaigns: new Set(),
+            adGroups: new Set()
+          });
+        }
+        const stat = map.get(g);
+        stat.clicks += clicks;
+        stat.impressions += impr;
+        stat.cost += cost;
+        stat.conversions += conv;
+        stat.convValue += convVal;
+        stat.termCount += 1;
+        if (campaign) stat.campaigns.add(campaign);
+        if (adGroup) stat.adGroups.add(adGroup);
+
+        // Per-campaign/ad-group context bucket
+        if (hasCampaign || hasAdGroup) {
+          const ctxKey = (campaign || '(unknown)') + '\u0001' + (adGroup || '(unknown)');
+          if (!stat.contexts.has(ctxKey)) {
+            stat.contexts.set(ctxKey, {
+              campaign: campaign, adGroup: adGroup,
+              clicks: 0, impressions: 0, cost: 0, conversions: 0, convValue: 0, termCount: 0,
+              sampleTerms: new Map()
+            });
+          }
+          const ctx = stat.contexts.get(ctxKey);
+          ctx.clicks += clicks;
+          ctx.impressions += impr;
+          ctx.cost += cost;
+          ctx.conversions += conv;
+          ctx.convValue += convVal;
+          ctx.termCount += 1;
+          // Keep up to 5 example search terms per context (highest-cost first)
+          if (!ctx.sampleTerms.has(term)) {
+            ctx.sampleTerms.set(term, { clicks: 0, cost: 0, conversions: 0, convValue: 0, matchType: matchType, keyword: keyword });
+          }
+          const st = ctx.sampleTerms.get(term);
+          st.clicks += clicks; st.cost += cost; st.conversions += conv; st.convValue += convVal;
+        }
+      }
+    }
+  }
+
+  function buildList(n) {
+    const list = [];
+    const it = grams[n].values();
+    let entry = it.next();
+    while (!entry.done) {
+      const stat = entry.value;
+      if (stat.clicks >= opts.minClicks) {
+        const cpc = stat.clicks > 0 ? stat.cost / stat.clicks : 0;
+        const cvr = stat.clicks > 0 ? (stat.conversions / stat.clicks) * 100 : 0;
+        const cpa = stat.conversions > 0 ? stat.cost / stat.conversions : null;
+        const roas = stat.cost > 0 ? stat.convValue / stat.cost : null;
+        const ctr = stat.impressions > 0 ? (stat.clicks / stat.impressions) * 100 : null;
+
+        // Classification:
+        //   flagged    — meets cost threshold AND below CVR threshold (waste candidate)
+        //   profitable — has conversions AND (ROAS >= 1 OR conversions exist with no value tracking)
+        //   neutral    — everything else
+        let cls = 'neutral';
+        let label = 'Review';
+        const hasValue = stat.convValue > 0;
+
+        if (stat.cost >= opts.minCost && cvr < opts.cvrThreshold) {
+          cls = 'flagged';
+          label = stat.conversions === 0 ? 'Zero conv' : 'Low CVR';
+        } else if (hasValue && roas !== null && roas >= 1) {
+          cls = 'profitable';
+          label = 'Profitable';
+        } else if (stat.conversions > 0) {
+          cls = 'profitable';
+          label = 'Converting';
+        }
+
+        list.push({
+          gram: stat.gram,
+          clicks: stat.clicks,
+          impressions: stat.impressions,
+          cost: stat.cost,
+          conversions: stat.conversions,
+          convValue: stat.convValue,
+          termCount: stat.termCount,
+          campaignCount: stat.campaigns.size,
+          adGroupCount: stat.adGroups.size,
+          contexts: stat.contexts,
+          campaigns: stat.campaigns,
+          adGroups: stat.adGroups,
+          cpc: cpc, cvr: cvr, cpa: cpa, roas: roas, ctr: ctr,
+          cls: cls, label: label
+        });
+      }
+      entry = it.next();
+    }
+    return list;
+  }
+
+  const unigrams = buildList(1);
+  const bigrams = buildList(2);
+  const trigrams = buildList(3);
+
+  // Also keep a compact per-row record so scoped totals can be recomputed accurately.
+  // (We don't need every column — just the fields used for stats and grouping.)
+  const compactRows = [];
+  for (let i = 0; i < parsed.rows.length; i++) {
+    const row = parsed.rows[i];
+    const term = row[termCol] || '';
+    if (!term) continue;
+    compactRows.push({
+      term: term,
+      clicks: parseNum(getCol(row, COL_CLICKS)),
+      impr: parseNum(getCol(row, COL_IMPR)),
+      cost: parseNum(getCol(row, COL_COST)),
+      conv: parseNum(getCol(row, COL_CONV)),
+      convVal: parseNum(getCol(row, COL_CONVVAL)),
+      campaign: hasCampaign ? getCol(row, COL_CAMPAIGN) : '',
+      adGroup: hasAdGroup ? getCol(row, COL_ADGROUP) : '',
+      keyword: hasKeyword ? getCol(row, COL_KEYWORD) : '',
+      matchType: hasMatch ? getCol(row, COL_MATCH) : ''
+    });
+  }
+
+  _results = {
+    unigrams: unigrams, bigrams: bigrams, trigrams: trigrams,
+    totals: totals,
+    opts: opts,
+    parsed: { rowCount: parsed.rows.length },
+    rows: compactRows,
+    context: {
+      hasCampaign: hasCampaign,
+      hasAdGroup: hasAdGroup,
+      hasKeyword: hasKeyword,
+      hasMatch: hasMatch,
+      campaigns: Array.from(campaignSet).sort(),
+      adGroups: Array.from(adGroupSet).sort()
+    }
+  };
+
+  _activeGram = 2;
+  _sortKey = 'cost';
+  _sortDir = 'desc';
+  _filterMode = 'all';
+  _scopeType = 'all';
+  _scopeValue = '';
+  _expandedRows = new Set();
+
+  renderResults();
+  document.getElementById('num-1').textContent = '\u2713';
+  document.getElementById('tab-input').classList.add('done');
+  goTab('results');
+}
+
+// ============== SCOPE FILTERING ==============
+// Returns a copy of the n-gram list filtered to the current scope (campaign / ad-group / all).
+// When scoped to a specific campaign or ad-group we re-derive metrics from the per-context bucket
+// so percentages, ROAS, CVR etc all reflect ONLY that scope.
+function applyScope(list) {
+  if (!_results) return [];
+  if (_scopeType === 'all' || !_scopeValue) return list;
+
+  const opts = _results.opts;
+  const out = [];
+  for (let i = 0; i < list.length; i++) {
+    const g = list[i];
+    if (!g.contexts || g.contexts.size === 0) continue;
+
+    let clicks = 0, impr = 0, cost = 0, conv = 0, convVal = 0, termCount = 0;
+    const it = g.contexts.values();
+    let entry = it.next();
+    while (!entry.done) {
+      const ctx = entry.value;
+      const match = (_scopeType === 'campaign' && ctx.campaign === _scopeValue)
+                 || (_scopeType === 'adgroup'  && ctx.adGroup === _scopeValue);
+      if (match) {
+        clicks += ctx.clicks;
+        impr += ctx.impressions;
+        cost += ctx.cost;
+        conv += ctx.conversions;
+        convVal += ctx.convValue;
+        termCount += ctx.termCount;
+      }
+      entry = it.next();
+    }
+    if (clicks < opts.minClicks) continue;
+
+    const cpc = clicks > 0 ? cost / clicks : 0;
+    const cvr = clicks > 0 ? (conv / clicks) * 100 : 0;
+    const cpa = conv > 0 ? cost / conv : null;
+    const roas = cost > 0 ? convVal / cost : null;
+    const ctr = impr > 0 ? (clicks / impr) * 100 : null;
+    let cls = 'neutral', label = 'Review';
+    if (cost >= opts.minCost && cvr < opts.cvrThreshold) {
+      cls = 'flagged';
+      label = conv === 0 ? 'Zero conv' : 'Low CVR';
+    } else if (convVal > 0 && roas !== null && roas >= 1) {
+      cls = 'profitable'; label = 'Profitable';
+    } else if (conv > 0) {
+      cls = 'profitable'; label = 'Converting';
+    }
+    out.push({
+      gram: g.gram,
+      clicks: clicks, impressions: impr, cost: cost, conversions: conv, convValue: convVal,
+      termCount: termCount, campaignCount: g.campaignCount, adGroupCount: g.adGroupCount,
+      contexts: g.contexts, campaigns: g.campaigns, adGroups: g.adGroups,
+      cpc: cpc, cvr: cvr, cpa: cpa, roas: roas, ctr: ctr, cls: cls, label: label
+    });
+  }
+  return out;
+}
+
+function getScopedList(n) {
+  if (!_results) return [];
+  const raw = n === 1 ? _results.unigrams : n === 2 ? _results.bigrams : _results.trigrams;
+  return applyScope(raw);
+}
+
+function setScope(type, value) {
+  _scopeType = type;
+  _scopeValue = value;
+  _expandedRows = new Set();
+  renderResults();
+}
+
+// ============== RENDER ==============
+function renderResults() {
+  if (!_results) return;
+  const r = _results;
+  const sym = r.opts.currency;
+  const ctx = r.context;
+
+  // Use scoped lists so all dashboards respect the campaign/ad-group filter.
+  const scopedUnigrams = applyScope(r.unigrams);
+  const scopedBigrams  = applyScope(r.bigrams);
+  const scopedTrigrams = applyScope(r.trigrams);
+
+  // "Wasted spend" headline = sum of cost on flagged BIGRAMS in the current scope.
+  const wastedBigrams = scopedBigrams.filter(function(x){ return x.cls === 'flagged'; });
+  const wastedCost = wastedBigrams.reduce(function(s,x){ return s + x.cost; }, 0);
+  const wastedClicks = wastedBigrams.reduce(function(s,x){ return s + x.clicks; }, 0);
+
+  // Compute scoped totals straight from the raw rows.
+  let totalCost = 0, totalClicks = 0, totalConv = 0, totalConvVal = 0, totalTerms = 0, totalImpr = 0;
+  if (_scopeType === 'all' || !_scopeValue) {
+    totalCost = r.totals.cost;
+    totalClicks = r.totals.clicks;
+    totalConv = r.totals.conversions;
+    totalConvVal = r.totals.convValue;
+    totalTerms = r.parsed.rowCount;
+    totalImpr = r.totals.impressions;
+  } else {
+    for (let i = 0; i < r.rows.length; i++) {
+      const row = r.rows[i];
+      const match = (_scopeType === 'campaign' && row.campaign === _scopeValue)
+                 || (_scopeType === 'adgroup'  && row.adGroup === _scopeValue);
+      if (match) {
+        totalCost += row.cost;
+        totalClicks += row.clicks;
+        totalConv += row.conv;
+        totalConvVal += row.convVal;
+        totalImpr += row.impr;
+        totalTerms += 1;
+      }
+    }
+  }
+
+  const acctCvr = totalClicks > 0 ? (totalConv / totalClicks) * 100 : 0;
+  const acctCpc = totalClicks > 0 ? totalCost / totalClicks : 0;
+  const acctRoas = totalCost > 0 ? totalConvVal / totalCost : 0;
+
+  const parts = [];
+
+  // Scope filter banner — only shows if Campaign or Ad Group columns were present in the CSV.
+  if (ctx.hasCampaign || ctx.hasAdGroup) {
+    let scopeBanner = '<div class="scope-bar">'
+      + '<div class="scope-label">'
+      +   '<span class="scope-icon">\ud83c\udfaf</span>'
+      +   '<span>Scope analysis to:</span>'
+      + '</div>'
+      + '<div class="scope-controls">';
+    scopeBanner += '<button class="scope-btn ' + (_scopeType === 'all' ? 'active' : '') + '" onclick="setScope(\'all\', \'\')">'
+      + 'Entire account <span class="scope-count">(' + intf(r.parsed.rowCount) + ' terms)</span>'
+      + '</button>';
+    if (ctx.hasCampaign && ctx.campaigns.length > 0) {
+      const campSel = ctx.campaigns.map(function(c) {
+        const selAttr = (_scopeType === 'campaign' && _scopeValue === c) ? ' selected' : '';
+        return '<option value="' + esc(c) + '"' + selAttr + '>' + esc(c) + '</option>';
+      }).join('');
+      scopeBanner += '<select class="scope-select" onchange="if(this.value)setScope(\'campaign\', this.value); else setScope(\'all\', \'\');" data-scope="campaign">'
+        + '<option value="">' + (_scopeType === 'campaign' ? 'Change campaign\u2026' : 'Pick a campaign\u2026') + '</option>'
+        + campSel
+        + '</select>';
+    }
+    if (ctx.hasAdGroup && ctx.adGroups.length > 0) {
+      const agSel = ctx.adGroups.map(function(a) {
+        const selAttr = (_scopeType === 'adgroup' && _scopeValue === a) ? ' selected' : '';
+        return '<option value="' + esc(a) + '"' + selAttr + '>' + esc(a) + '</option>';
+      }).join('');
+      scopeBanner += '<select class="scope-select" onchange="if(this.value)setScope(\'adgroup\', this.value); else setScope(\'all\', \'\');" data-scope="adgroup">'
+        + '<option value="">' + (_scopeType === 'adgroup' ? 'Change ad group\u2026' : 'Pick an ad group\u2026') + '</option>'
+        + agSel
+        + '</select>';
+    }
+    scopeBanner += '</div>';
+    if (_scopeType !== 'all') {
+      scopeBanner += '<button class="scope-clear" onclick="setScope(\'all\', \'\')">\u2715 Clear scope</button>';
+    }
+    scopeBanner += '</div>';
+    parts.push(scopeBanner);
+  } else {
+    // Hint: tell the user how to unlock campaign-level analysis
+    parts.push(
+      '<div class="alert alert-warn">'
+      + '<div class="alert-icon">\u2139\ufe0f</div>'
+      + '<div><strong>Want to see which campaigns / ad groups are triggering these terms?</strong> '
+      + 'Re-export your search terms report from Google Ads with the <strong>Campaign</strong> and <strong>Ad group</strong> columns added (click the columns icon in the search terms view). '
+      + 'Then re-upload here. The tool will auto-detect them and show per-campaign breakdowns + smarter, scope-correct negative keywords.</div>'
+      + '</div>'
+    );
+  }
+
+  // Alert banner
+  if (wastedCost > 0 && wastedBigrams.length > 0) {
+    const pctWaste = totalCost > 0 ? (wastedCost / totalCost) * 100 : 0;
+    const scopeLabel = _scopeType === 'all' ? '' : (_scopeType === 'campaign' ? ' in <strong>' + esc(_scopeValue) + '</strong>' : ' in ad group <strong>' + esc(_scopeValue) + '</strong>');
+    parts.push(
+      '<div class="alert alert-danger">'
+      + '<div class="alert-icon">\ud83d\udea8</div>'
+      + '<div><strong>' + wastedBigrams.length + ' 2-word patterns are wasting ' + money(wastedCost, sym) + '</strong>' + scopeLabel
+      + ' &mdash; that\'s <strong>' + pctWaste.toFixed(1) + '%</strong> of total spend going to phrases with conversion rate below ' + r.opts.cvrThreshold + '%.'
+      + ' Scroll down for the breakdown and a paste-ready negative keyword list.</div>'
+      + '</div>'
+    );
+  } else if (totalTerms > 0) {
+    parts.push(
+      '<div class="alert alert-ok">'
+      + '<div class="alert-icon">\u2705</div>'
+      + '<div>Analyzed <strong>' + intf(totalTerms) + ' search terms</strong> across <strong>' + intf(totalClicks) + ' clicks</strong>.'
+      + ' No 2-word patterns meet the waste threshold (cost \u2265 ' + money(r.opts.minCost, sym) + ', CVR &lt; ' + r.opts.cvrThreshold + '%).'
+      + ' Either your account is well-targeted, or try lowering the thresholds in the settings.</div>'
+      + '</div>'
+    );
+  }
+
+  // Account totals (scoped)
+  parts.push(
+    '<div class="stats-row">'
+    + '<div class="stat-card">'
+    +   '<div class="slabel">Search terms analyzed</div>'
+    +   '<div class="sval">' + intf(totalTerms) + '</div>'
+    +   '<div class="ssub">' + intf(totalClicks) + ' total clicks</div>'
+    + '</div>'
+    + '<div class="stat-card warn">'
+    +   '<div class="slabel">Total spend</div>'
+    +   '<div class="sval">' + money(totalCost, sym) + '</div>'
+    +   '<div class="ssub">CPC ' + money(acctCpc, sym) + ' avg</div>'
+    + '</div>'
+    + '<div class="stat-card ' + (wastedCost > 0 ? 'highlight' : '') + '">'
+    +   '<div class="slabel">Wasted on bad patterns</div>'
+    +   '<div class="sval">' + money(wastedCost, sym) + '</div>'
+    +   '<div class="ssub">' + wastedBigrams.length + ' 2-grams flagged &middot; ' + intf(wastedClicks) + ' clicks</div>'
+    + '</div>'
+    + '<div class="stat-card good">'
+    +   '<div class="slabel">' + (_scopeType === 'all' ? 'Account CVR' : 'Scope CVR') + '</div>'
+    +   '<div class="sval">' + pct(acctCvr) + '</div>'
+    +   '<div class="ssub">' + intf(totalConv) + ' conversions &middot; ' + (acctRoas > 0 ? acctRoas.toFixed(2) + 'x ROAS' : '\u2014') + '</div>'
+    + '</div>'
+    + '</div>'
+  );
+
+  // Top-5 insights (scoped)
+  const topWasteUni = scopedUnigrams.filter(function(x){ return x.cls === 'flagged'; }).slice().sort(function(a,b){ return b.cost - a.cost; }).slice(0, 5);
+  const topConvBi = scopedBigrams.filter(function(x){ return x.cls === 'profitable'; }).slice().sort(function(a,b){ return b.conversions - a.conversions; }).slice(0, 5);
+
+  if (topWasteUni.length || topConvBi.length) {
+    parts.push('<div class="insights-grid">');
+    if (topWasteUni.length) {
+      parts.push('<div class="insight-card waste"><h4>\ud83d\udea8 Top 5 wasteful words</h4>');
+      topWasteUni.forEach(function(g) {
+        parts.push(
+          '<div class="insight-row">'
+          + '<span class="insight-key">' + esc(g.gram) + '</span>'
+          + '<span class="insight-val">' + money(g.cost, sym) + ' &middot; ' + g.conversions + ' conv</span>'
+          + '</div>'
+        );
+      });
+      parts.push('</div>');
+    }
+    if (topConvBi.length) {
+      parts.push('<div class="insight-card win"><h4>\u2705 Top 5 converting phrases</h4>');
+      topConvBi.forEach(function(g) {
+        parts.push(
+          '<div class="insight-row">'
+          + '<span class="insight-key">' + esc(g.gram) + '</span>'
+          + '<span class="insight-val">' + g.conversions + ' conv &middot; ' + pct(g.cvr) + '</span>'
+          + '</div>'
+        );
+      });
+      parts.push('</div>');
+    }
+    parts.push('</div>');
+  }
+
+  // Negatives block
+  parts.push(renderNegativeBlock());
+
+  // Gram tabs (counts reflect current scope)
+  parts.push(
+    '<div class="gram-tabs">'
+    + '<button class="gram-tab ' + (_activeGram === 1 ? 'active' : '') + '" onclick="setGram(1)">1-grams <span class="count">(' + scopedUnigrams.length + ')</span></button>'
+    + '<button class="gram-tab ' + (_activeGram === 2 ? 'active' : '') + '" onclick="setGram(2)">2-grams <span class="count">(' + scopedBigrams.length + ')</span></button>'
+    + '<button class="gram-tab ' + (_activeGram === 3 ? 'active' : '') + '" onclick="setGram(3)">3-grams <span class="count">(' + scopedTrigrams.length + ')</span></button>'
+    + '</div>'
+  );
+
+  // Table
+  parts.push(
+    '<div class="table-wrap">'
+    + '<div class="table-toolbar">'
+    +   '<select id="f-mode" onchange="setFilter(this.value)">'
+    +     '<option value="all"' + (_filterMode === 'all' ? ' selected' : '') + '>All n-grams</option>'
+    +     '<option value="flagged"' + (_filterMode === 'flagged' ? ' selected' : '') + '>Wasteful only (flag for negatives)</option>'
+    +     '<option value="profitable"' + (_filterMode === 'profitable' ? ' selected' : '') + '>Profitable only</option>'
+    +     '<option value="unconverted"' + (_filterMode === 'unconverted' ? ' selected' : '') + '>Zero conversions only</option>'
+    +   '</select>'
+    +   '<input type="text" id="f-search" placeholder="Search n-gram\u2026" oninput="renderTable()">'
+    +   '<button class="export-btn" onclick="exportNgramCSV()">'
+    +     '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v6M3 4l3 3 3-3M1 9h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'
+    +     ' Export current view as CSV'
+    +   '</button>'
+    + '</div>'
+    + '<div class="table-scroll">'
+    +   '<table class="results-table">'
+    +     '<thead><tr id="results-thead"></tr></thead>'
+    +     '<tbody id="results-tbody"></tbody>'
+    +   '</table>'
+    + '</div>'
+    + '</div>'
+  );
+
+  document.getElementById('results-content').innerHTML = parts.join('');
+  renderTable();
+}
+
+function setGram(n) {
+  _activeGram = n;
+  renderResults();
+}
+function setFilter(mode) {
+  _filterMode = mode;
+  renderTable();
+}
+
+function getActiveList() {
+  return getScopedList(_activeGram);
+}
+
+function toggleExpand(gramKey) {
+  if (_expandedRows.has(gramKey)) _expandedRows.delete(gramKey);
+  else _expandedRows.add(gramKey);
+  renderTable();
+}
+
+// Build the expandable context drawer for a single n-gram.
+// Shows a breakdown by campaign/ad group with example search terms.
+function renderContextDrawer(g, sym, colSpan) {
+  const r = _results;
+  const ctx = r.context;
+  if (!g.contexts || g.contexts.size === 0) {
+    return '<tr class="ctx-drawer"><td colspan="' + colSpan + '">No campaign/ad-group context available. Re-export with Campaign and Ad group columns to see this breakdown.</td></tr>';
+  }
+  // Sort contexts by cost descending. If scope is active, only show contexts matching the scope.
+  const ctxList = [];
+  const it = g.contexts.values();
+  let entry = it.next();
+  while (!entry.done) {
+    const c = entry.value;
+    if (_scopeType !== 'all' && _scopeValue) {
+      const match = (_scopeType === 'campaign' && c.campaign === _scopeValue)
+                 || (_scopeType === 'adgroup'  && c.adGroup === _scopeValue);
+      if (!match) { entry = it.next(); continue; }
+    }
+    ctxList.push(c);
+    entry = it.next();
+  }
+  ctxList.sort(function(a, b){ return b.cost - a.cost; });
+  if (!ctxList.length) {
+    return '<tr class="ctx-drawer"><td colspan="' + colSpan + '">No campaigns matched the current scope.</td></tr>';
+  }
+
+  let html = '<tr class="ctx-drawer" onclick="event.stopPropagation()"><td colspan="' + colSpan + '">';
+  html += '<div class="ctx-drawer-inner">';
+  html += '<div class="ctx-drawer-title">'
+       +    '<span>Where "<strong>' + esc(g.gram) + '</strong>" appears'
+       +    (_scopeType === 'all' ? ' &mdash; ' + ctxList.length + ' campaign/ad-group combination' + (ctxList.length === 1 ? '' : 's') : '')
+       +    '</span>'
+       +    '<div class="ctx-drawer-actions">';
+  // Quick action: add a campaign-level negative
+  if (ctx.hasCampaign && g.cls === 'flagged') {
+    html += '<button class="copy-btn" onclick="copyNegativeForGram(' + JSON.stringify(g.gram).replace(/"/g,'&quot;') + ')">Copy negative for this n-gram</button>';
+  }
+  html += '</div></div>';
+
+  // Table of contexts
+  html += '<table class="ctx-table">';
+  html += '<thead><tr>';
+  if (ctx.hasCampaign) html += '<th>Campaign</th>';
+  if (ctx.hasAdGroup)  html += '<th>Ad group</th>';
+  html += '<th class="num">Clicks</th><th class="num">Cost</th><th class="num">Conv.</th><th class="num">CVR</th><th class="num">ROAS</th><th>Examples (top spending search terms)</th>';
+  html += '</tr></thead><tbody>';
+  ctxList.forEach(function(c) {
+    const ccvr = c.clicks > 0 ? (c.conversions / c.clicks) * 100 : 0;
+    const croas = c.cost > 0 ? c.convValue / c.cost : null;
+    const isWaste = c.cost >= r.opts.minCost && ccvr < r.opts.cvrThreshold;
+    // Sort sample terms by cost desc, take top 3
+    const samples = [];
+    const sit = c.sampleTerms.entries();
+    let sentry = sit.next();
+    while (!sentry.done) {
+      samples.push({ term: sentry.value[0], data: sentry.value[1] });
+      sentry = sit.next();
+    }
+    samples.sort(function(a,b){ return b.data.cost - a.data.cost; });
+    const sampleHtml = samples.slice(0, 3).map(function(s) {
+      return '<div class="ctx-sample">' + esc(s.term)
+        + ' <span class="ctx-sample-meta">' + money(s.data.cost, sym) + ' &middot; ' + s.data.clicks + ' clicks'
+        + (s.data.conversions > 0 ? ' &middot; ' + s.data.conversions + ' conv' : '')
+        + (s.data.matchType ? ' &middot; ' + esc(s.data.matchType.toLowerCase()) : '')
+        + '</span></div>';
+    }).join('');
+    const moreCount = samples.length - 3;
+    const moreHtml = moreCount > 0 ? '<div class="ctx-sample-more">+ ' + moreCount + ' more</div>' : '';
+    html += '<tr class="' + (isWaste ? 'ctx-row-waste' : '') + '">';
+    if (ctx.hasCampaign) html += '<td class="ctx-name">' + esc(c.campaign || '\u2014') + '</td>';
+    if (ctx.hasAdGroup)  html += '<td class="ctx-name">' + esc(c.adGroup || '\u2014') + '</td>';
+    html += '<td class="num">' + intf(c.clicks) + '</td>';
+    html += '<td class="num">' + money(c.cost, sym) + '</td>';
+    html += '<td class="num">' + (c.conversions % 1 === 0 ? c.conversions : c.conversions.toFixed(2)) + '</td>';
+    html += '<td class="num">' + pct(ccvr) + '</td>';
+    html += '<td class="num">' + (croas !== null ? croas.toFixed(2) + 'x' : '\u2014') + '</td>';
+    html += '<td class="ctx-samples">' + sampleHtml + moreHtml + '</td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  html += '</div></td></tr>';
+  return html;
+}
+
+function renderTable() {
+  if (!_results) return;
+  const sym = _results.opts.currency;
+  const ctx = _results.context;
+  const showCampaignCol = ctx.hasCampaign || ctx.hasAdGroup;
+
+  const thead = document.getElementById('results-thead');
+  if (!thead) return;
+
+  const cols = [];
+  cols.push({ key: '_expand', label: '', align: 'center', noSort: true });
+  cols.push({ key: 'gram', label: 'N-gram', align: 'left' });
+  cols.push({ key: 'clicks', label: 'Clicks', align: 'right' });
+  cols.push({ key: 'impressions', label: 'Impr.', align: 'right' });
+  cols.push({ key: 'cost', label: 'Cost', align: 'right' });
+  cols.push({ key: 'conversions', label: 'Conv.', align: 'right' });
+  cols.push({ key: 'convValue', label: 'Conv. value', align: 'right' });
+  cols.push({ key: 'cpc', label: 'CPC', align: 'right' });
+  cols.push({ key: 'ctr', label: 'CTR', align: 'right' });
+  cols.push({ key: 'cvr', label: 'CVR', align: 'right' });
+  cols.push({ key: 'cpa', label: 'CPA', align: 'right' });
+  cols.push({ key: 'roas', label: 'ROAS', align: 'right' });
+  cols.push({ key: 'termCount', label: 'Terms', align: 'right' });
+  if (showCampaignCol) cols.push({ key: 'campaignCount', label: 'Campaigns', align: 'right' });
+  cols.push({ key: 'cls', label: 'Flag', align: 'left' });
+
+  thead.innerHTML = cols.map(function(c) {
+    if (c.noSort) return '<th style="width:32px"></th>';
+    const cls = (_sortKey === c.key) ? (_sortDir === 'asc' ? 'sort-asc' : 'sort-desc') : '';
+    return '<th class="' + cls + '" onclick="sortBy(\'' + c.key + '\')" style="text-align:' + c.align + '">' + esc(c.label) + '</th>';
+  }).join('');
+
+  const colSpan = cols.length;
+
+  // Filter + sort
+  const searchEl = document.getElementById('f-search');
+  const search = (searchEl && searchEl.value || '').toLowerCase().trim();
+  let list = getActiveList().filter(function(g) {
+    if (_filterMode === 'flagged' && g.cls !== 'flagged') return false;
+    if (_filterMode === 'profitable' && g.cls !== 'profitable') return false;
+    if (_filterMode === 'unconverted' && g.conversions !== 0) return false;
+    if (search && g.gram.toLowerCase().indexOf(search) === -1) return false;
+    return true;
+  });
+
+  list.sort(function(a, b) {
+    let av = a[_sortKey], bv = b[_sortKey];
+    if (av === null || av === undefined) av = -Infinity;
+    if (bv === null || bv === undefined) bv = -Infinity;
+    if (typeof av === 'string') av = av.toLowerCase();
+    if (typeof bv === 'string') bv = bv.toLowerCase();
+    if (av < bv) return _sortDir === 'asc' ? -1 : 1;
+    if (av > bv) return _sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const tbody = document.getElementById('results-tbody');
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="' + colSpan + '" style="text-align:center;padding:32px;color:var(--text3);">No n-grams match this filter.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = list.map(function(g) {
+    const rowCls = g.cls === 'flagged' ? 'flagged' : g.cls === 'profitable' ? 'profitable' : '';
+    const pillCls = g.cls === 'flagged' ? 'pill-danger' : g.cls === 'profitable' ? 'pill-ok' : 'pill-neutral';
+    const gramKey = _activeGram + ':' + g.gram;
+    const isExpanded = _expandedRows.has(gramKey);
+    const canExpand = showCampaignCol && g.contexts && g.contexts.size > 0;
+    const expandCell = canExpand
+      ? '<td class="expand-cell" onclick="event.stopPropagation()"><button class="expand-btn ' + (isExpanded ? 'open' : '') + '" onclick="event.stopPropagation(); toggleExpand(' + JSON.stringify(gramKey).replace(/"/g,'&quot;') + ')" title="Show campaigns / ad groups">' + (isExpanded ? '\u2212' : '+') + '</button></td>'
+      : '<td></td>';
+
+    let campaignCell = '';
+    if (showCampaignCol) {
+      const cc = g.campaignCount || 0;
+      const ac = g.adGroupCount || 0;
+      const meta = ctx.hasCampaign ? cc + ' camp' : ac + ' AG';
+      const detail = (ctx.hasCampaign && ctx.hasAdGroup) ? ' / ' + ac + ' AG' : '';
+      // Highlight when scoped to single campaign/ad-group
+      const cls = (cc === 1 && ctx.hasCampaign) ? 'col-camp single' : 'col-camp';
+      campaignCell = '<td class="num ' + cls + '">' + meta + detail + '</td>';
+    }
+
+    let html = '<tr class="' + rowCls + (canExpand ? ' expandable' : '') + '"'
+      + (canExpand ? ' onclick="toggleExpand(' + JSON.stringify(gramKey).replace(/"/g,'&quot;') + ')"' : '')
+      + '>'
+      + expandCell
+      + '<td class="gram-cell">' + esc(g.gram) + '</td>'
+      + '<td class="num">' + intf(g.clicks) + '</td>'
+      + '<td class="num">' + intf(g.impressions) + '</td>'
+      + '<td class="num">' + money(g.cost, sym) + '</td>'
+      + '<td class="num">' + (g.conversions % 1 === 0 ? g.conversions : g.conversions.toFixed(2)) + '</td>'
+      + '<td class="num">' + money(g.convValue, sym) + '</td>'
+      + '<td class="num">' + money(g.cpc, sym) + '</td>'
+      + '<td class="num">' + (g.ctr !== null ? pct(g.ctr) : '\u2014') + '</td>'
+      + '<td class="num">' + pct(g.cvr) + '</td>'
+      + '<td class="num">' + (g.cpa !== null ? money(g.cpa, sym) : '\u2014') + '</td>'
+      + '<td class="num">' + (g.roas !== null ? g.roas.toFixed(2) + 'x' : '\u2014') + '</td>'
+      + '<td class="num">' + intf(g.termCount) + '</td>'
+      + campaignCell
+      + '<td><span class="pill ' + pillCls + '">' + esc(g.label) + '</span></td>'
+      + '</tr>';
+
+    if (isExpanded) {
+      html += renderContextDrawer(g, sym, colSpan);
+    }
+    return html;
+  }).join('');
+}
+
+function sortBy(key) {
+  if (_sortKey === key) {
+    _sortDir = _sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    _sortKey = key;
+    _sortDir = (key === 'gram') ? 'asc' : 'desc';
+  }
+  renderTable();
+}
+
+// ============== NEGATIVE KEYWORD GENERATION ==============
+// Each negative carries metadata about the BEST scope to apply it at:
+//   - "account" — n-gram is wasteful across many campaigns; safer/easier as account-level negative list
+//   - "campaign" — n-gram waste is concentrated in ONE campaign (>= 80% of its cost there); apply campaign-level
+//   - "adgroup"  — same idea, but at ad-group level
+//
+// When the user is actively scoping the analysis to a campaign/ad-group, all suggested negatives
+// default to that scope (the user is clearly working on that scope specifically).
+function buildNegatives() {
+  if (!_results) return { lines: [], summary: '', negatives: [], scoped: false };
+
+  const sym = _results.opts.currency;
+  const ctxMeta = _results.context;
+
+  // Use SCOPED lists — so if a campaign is selected, only that campaign's flagged n-grams appear.
+  const flagged1 = applyScope(_results.unigrams).filter(function(x){ return x.cls === 'flagged'; }).slice().sort(function(a,b){ return b.cost - a.cost; });
+  const flagged2 = applyScope(_results.bigrams).filter(function(x){ return x.cls === 'flagged'; }).slice().sort(function(a,b){ return b.cost - a.cost; });
+  const flagged3 = applyScope(_results.trigrams).filter(function(x){ return x.cls === 'flagged'; }).slice().sort(function(a,b){ return b.cost - a.cost; });
+
+  // Determine the recommended scope for one n-gram, based on context concentration.
+  function recommendScope(g, matchType) {
+    // If the user has actively scoped, honour that.
+    if (_scopeType === 'campaign' && _scopeValue) {
+      return { scope: 'campaign', target: _scopeValue, matchType: matchType, reason: 'Currently scoped to this campaign' };
+    }
+    if (_scopeType === 'adgroup' && _scopeValue) {
+      return { scope: 'adgroup', target: _scopeValue, matchType: matchType, reason: 'Currently scoped to this ad group' };
+    }
+    // No scope active — decide from data.
+    if (!g.contexts || g.contexts.size === 0) {
+      return { scope: 'account', target: '', matchType: matchType, reason: 'No campaign data available' };
+    }
+    // Find which single campaign holds the majority of this n-gram's cost.
+    const campAgg = {};
+    const it = g.contexts.values();
+    let entry = it.next();
+    while (!entry.done) {
+      const c = entry.value;
+      const k = c.campaign || '(unknown)';
+      if (!campAgg[k]) campAgg[k] = 0;
+      campAgg[k] += c.cost;
+      entry = it.next();
+    }
+    const entries = Object.entries(campAgg).sort(function(a,b){ return b[1]-a[1]; });
+    const totalCost = entries.reduce(function(s,e){ return s+e[1]; }, 0);
+    if (entries.length === 0 || totalCost <= 0) {
+      return { scope: 'account', target: '', matchType: matchType, reason: 'No cost data' };
+    }
+    const topShare = entries[0][1] / totalCost;
+    if (ctxMeta.hasCampaign && entries[0][1] > 0 && topShare >= 0.8 && entries[0][0] !== '(unknown)') {
+      return {
+        scope: 'campaign', target: entries[0][0], matchType: matchType,
+        reason: Math.round(topShare * 100) + '% of waste concentrated in this campaign'
+      };
+    }
+    return {
+      scope: 'account', target: '', matchType: matchType,
+      reason: 'Spread across ' + entries.length + ' campaign' + (entries.length === 1 ? '' : 's')
+    };
+  }
+
+  const negatives = [];
+
+  // 1-grams + 2-grams as phrase match (broader, blocks variations).
+  // 3-grams as exact match (very specific — phrase match would risk over-blocking).
+  flagged1.forEach(function(g) {
+    const rec = recommendScope(g, 'phrase');
+    negatives.push({ keyword: g.gram, type: 'phrase', cost: g.cost, clicks: g.clicks, conv: g.conversions, scope: rec.scope, target: rec.target, reason: rec.reason });
+  });
+  flagged2.forEach(function(g) {
+    const rec = recommendScope(g, 'phrase');
+    negatives.push({ keyword: g.gram, type: 'phrase', cost: g.cost, clicks: g.clicks, conv: g.conversions, scope: rec.scope, target: rec.target, reason: rec.reason });
+  });
+  flagged3.forEach(function(g) {
+    const rec = recommendScope(g, 'exact');
+    negatives.push({ keyword: g.gram, type: 'exact', cost: g.cost, clicks: g.clicks, conv: g.conversions, scope: rec.scope, target: rec.target, reason: rec.reason });
+  });
+
+  // The plain "lines" string is the formatted list (used for preview).
+  const lines = negatives.map(function(n) {
+    const kw = n.type === 'exact' ? '[' + n.keyword + ']' : '"' + n.keyword + '"';
+    if (n.scope === 'campaign') return kw + '    \u2192 campaign: ' + n.target;
+    if (n.scope === 'adgroup')  return kw + '    \u2192 ad group: ' + n.target;
+    return kw + '    \u2192 account-level';
+  });
+
+  const totalCost = negatives.reduce(function(s,n){ return s + n.cost; }, 0);
+  const acctCount = negatives.filter(function(n){ return n.scope === 'account'; }).length;
+  const campCount = negatives.filter(function(n){ return n.scope === 'campaign'; }).length;
+  const agCount   = negatives.filter(function(n){ return n.scope === 'adgroup';  }).length;
+
+  let summary = negatives.length + ' suggested negatives ('
+    + flagged1.length + ' single-word, ' + flagged2.length + ' two-word, ' + flagged3.length + ' three-word) \u2014 could prevent '
+    + money(totalCost, sym) + ' of wasted spend per period.';
+  if (ctxMeta.hasCampaign && (campCount > 0 || agCount > 0)) {
+    summary += ' Scope split: ' + acctCount + ' account-level, ' + campCount + ' campaign-level, ' + agCount + ' ad-group-level.';
+  }
+
+  return { lines: lines, summary: summary, negatives: negatives, scoped: ctxMeta.hasCampaign };
+}
+
+// Build a campaign-level negative for a single n-gram on demand (called from the context drawer).
+function copyNegativeForGram(gram) {
+  if (!_results) return;
+  const list = getActiveList();
+  const g = list.find(function(x){ return x.gram === gram; });
+  if (!g) return;
+  // Match type: 1+2-grams → phrase, 3-grams → exact
+  const matchType = _activeGram === 3 ? 'exact' : 'phrase';
+  const kw = matchType === 'exact' ? '[' + g.gram + ']' : '"' + g.gram + '"';
+  // If scoped, suggest at scope level. Else find concentrated campaign.
+  let scopeNote = 'account-level';
+  if (_scopeType === 'campaign' && _scopeValue) scopeNote = 'campaign: ' + _scopeValue;
+  else if (_scopeType === 'adgroup' && _scopeValue) scopeNote = 'ad group: ' + _scopeValue;
+  else if (g.contexts && g.contexts.size > 0) {
+    // Find majority campaign
+    const campAgg = {};
+    const it = g.contexts.values();
+    let entry = it.next();
+    while (!entry.done) {
+      const c = entry.value;
+      const k = c.campaign || '';
+      if (k) campAgg[k] = (campAgg[k] || 0) + c.cost;
+      entry = it.next();
+    }
+    const entries = Object.entries(campAgg).sort(function(a,b){ return b[1]-a[1]; });
+    const total = entries.reduce(function(s,e){ return s+e[1]; }, 0);
+    if (entries.length > 0 && entries[0][1] / total >= 0.8) {
+      scopeNote = 'campaign: ' + entries[0][0];
+    }
+  }
+  doCopy(kw + '    \u2192 ' + scopeNote, 'Copied: ' + kw);
+}
+
+function renderNegativeBlock() {
+  const built = buildNegatives();
+  if (!built.lines.length) {
+    return '<div class="neg-output">'
+      + '<div class="neg-head"><h3>Suggested negative keywords</h3></div>'
+      + '<div class="neg-body">'
+      +   '<div class="alert alert-ok" style="margin-bottom: 0;">'
+      +     '<div class="alert-icon">\u2705</div>'
+      +     '<div>No negative keywords suggested &mdash; none of your n-grams meet the waste threshold (cost \u2265 ' + money(_results.opts.minCost, _results.opts.currency) + ', CVR &lt; ' + _results.opts.cvrThreshold + '%). Try lowering the thresholds to see borderline cases.</div>'
+      +   '</div>'
+      + '</div>'
+      + '</div>';
+  }
+
+  const preview = built.lines.slice(0, 50).join('\n') + (built.lines.length > 50 ? '\n\u2026and ' + (built.lines.length - 50) + ' more (use Copy or Export)' : '');
+
+  let scopeNote = '';
+  if (built.scoped) {
+    scopeNote = ' The tool inspects which campaigns each n-gram appears in and recommends the right scope: <strong>account-level</strong> for words that waste across many campaigns, <strong>campaign-level</strong> when the waste is concentrated (\u226580% of cost) in one campaign.';
+  }
+
+  return '<div class="neg-output">'
+    + '<div class="neg-head">'
+    +   '<h3>Suggested negative keywords</h3>'
+    +   '<div class="neg-meta">' + built.lines.length + ' keywords &middot; Phrase &amp; exact match</div>'
+    + '</div>'
+    + '<div class="neg-body">'
+    +   '<div class="neg-summary">'
+    +     '<strong>' + esc(built.summary) + '</strong><br>'
+    +     'Single + two-word patterns use <span class="mono">"phrase match"</span> (broader). Three-word patterns use <span class="mono">[exact match]</span> (safer, more specific).'
+    +     scopeNote
+    +     ' Review before adding &mdash; a word that looks wasteful at n-gram level might be valid in some contexts.'
+    +   '</div>'
+    +   '<div class="neg-actions">'
+    +     '<button class="copy-btn" onclick="copyNegatives(\'formatted\')">\u2398 Copy with match types &amp; scopes</button>'
+    +     '<button class="copy-btn" onclick="copyNegatives(\'editor\')">\u2398 Copy for Google Ads Editor (CSV)</button>'
+    +     '<button class="copy-btn" onclick="copyNegatives(\'raw\')">\u2398 Copy keywords only</button>'
+    +   '</div>'
+    +   '<div class="neg-list">' + esc(preview) + '</div>'
+    + '</div>'
+    + '</div>';
+}
+
+function copyNegatives(format) {
+  const built = buildNegatives();
+  if (!built.negatives.length) return;
+  let text;
+  if (format === 'formatted') {
+    text = built.negatives.map(function(n) {
+      const kw = n.type === 'exact' ? '[' + n.keyword + ']' : '"' + n.keyword + '"';
+      const scope = n.scope === 'campaign' ? '\t\u2192 campaign: ' + n.target
+                  : n.scope === 'adgroup'  ? '\t\u2192 ad group: ' + n.target
+                  : '\t\u2192 account-level';
+      return kw + scope;
+    }).join('\n');
+  } else if (format === 'editor') {
+    // Google Ads Editor bulk-upload format. When scope is campaign/ad-group, populate the
+    // Campaign / Ad group column so Editor applies the negative correctly.
+    const headers = ['Campaign', 'Ad group', 'Keyword', 'Match type', 'Status', 'Negative'];
+    const rows = built.negatives.map(function(n) {
+      const camp = n.scope === 'campaign' ? n.target : (n.scope === 'adgroup' ? '' : '');
+      const ag = n.scope === 'adgroup' ? n.target : '';
+      return [camp, ag, n.keyword, n.type === 'exact' ? 'Exact match' : 'Phrase match', 'Active', 'TRUE'];
+    });
+    text = headers.join(',') + '\n' + rows.map(function(r){ return r.map(function(c){ return '"' + String(c).replace(/"/g,'""') + '"'; }).join(','); }).join('\n');
+  } else {
+    text = built.negatives.map(function(n){ return n.keyword; }).join('\n');
+  }
+  doCopy(text, 'Copied ' + built.negatives.length + ' negatives');
+}
+
+function doCopy(text, msg) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function(){ toast(msg); }).catch(function(){ fallbackCopy(text, msg); });
+  } else {
+    fallbackCopy(text, msg);
+  }
+}
+function fallbackCopy(text, msg) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); toast(msg); } catch(e) { toast('Copy failed \u2014 select and copy manually'); }
+  document.body.removeChild(ta);
+}
+
+// ============== CSV EXPORT ==============
+function exportNgramCSV() {
+  if (!_results) return;
+  const sym = _results.opts.currency;
+  const ctxMeta = _results.context;
+  const list = getActiveList();
+  const searchEl = document.getElementById('f-search');
+  const search = (searchEl && searchEl.value || '').toLowerCase().trim();
+  let filtered = list.filter(function(g) {
+    if (_filterMode === 'flagged' && g.cls !== 'flagged') return false;
+    if (_filterMode === 'profitable' && g.cls !== 'profitable') return false;
+    if (_filterMode === 'unconverted' && g.conversions !== 0) return false;
+    if (search && g.gram.toLowerCase().indexOf(search) === -1) return false;
+    return true;
+  });
+  filtered.sort(function(a, b) {
+    let av = a[_sortKey], bv = b[_sortKey];
+    if (av === null || av === undefined) av = -Infinity;
+    if (bv === null || bv === undefined) bv = -Infinity;
+    if (typeof av === 'string') av = av.toLowerCase();
+    if (typeof bv === 'string') bv = bv.toLowerCase();
+    if (av < bv) return _sortDir === 'asc' ? -1 : 1;
+    if (av > bv) return _sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const headers = ['N-gram','Size','Clicks','Impressions','Cost','Conversions','Conv. value','CPC','CTR %','CVR %','CPA','ROAS','Terms','Flag'];
+  if (ctxMeta.hasCampaign) headers.push('Campaigns','Top campaign by cost');
+  if (ctxMeta.hasAdGroup) headers.push('Ad groups');
+  const rows = filtered.map(function(g) {
+    const r = [
+      g.gram,
+      _activeGram,
+      g.clicks,
+      g.impressions,
+      g.cost.toFixed(2),
+      g.conversions,
+      g.convValue.toFixed(2),
+      g.cpc.toFixed(2),
+      g.ctr !== null ? g.ctr.toFixed(2) : '',
+      g.cvr.toFixed(2),
+      g.cpa !== null ? g.cpa.toFixed(2) : '',
+      g.roas !== null ? g.roas.toFixed(2) : '',
+      g.termCount,
+      g.label
+    ];
+    if (ctxMeta.hasCampaign) {
+      r.push(g.campaignCount || 0);
+      // Find top campaign by cost
+      let topCamp = '', topCost = 0;
+      if (g.contexts) {
+        const it = g.contexts.values();
+        let entry = it.next();
+        const campAgg = {};
+        while (!entry.done) {
+          const c = entry.value;
+          if (c.campaign) campAgg[c.campaign] = (campAgg[c.campaign] || 0) + c.cost;
+          entry = it.next();
+        }
+        for (const k in campAgg) { if (campAgg[k] > topCost) { topCost = campAgg[k]; topCamp = k; } }
+      }
+      r.push(topCamp);
+    }
+    if (ctxMeta.hasAdGroup) r.push(g.adGroupCount || 0);
+    return r;
+  });
+  const csvLines = [headers].concat(rows).map(function(r){ return r.map(function(c){ return '"' + String(c).replace(/"/g,'""') + '"'; }).join(','); });
+  const blob = new Blob([csvLines.join('\n')], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const scopeSlug = _scopeType === 'all' ? 'all' : _scopeValue.replace(/[^a-z0-9]+/gi, '-').toLowerCase().slice(0, 40);
+  a.download = 'ngram-analysis-' + _activeGram + 'gram-' + scopeSlug + '-' + new Date().toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(a.href); }, 100);
+  toast('CSV exported');
+}
+</script>
+</body>
+</html>
